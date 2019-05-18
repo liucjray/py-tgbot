@@ -7,5 +7,6 @@ class TelegramBG88(TelegramBase):
             'token': self.config['TG']['ACCESS_TOKEN_GYOABOT'],
             'chat_id': self.config['TG']['CHAT_ID_BG88'],
             'collection': 'bg88',
+            'delete_cmd': ['000', 'BZ', 'bz'],
         }
         super(TelegramBG88, self).__init__(settings)

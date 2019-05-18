@@ -1,22 +1,29 @@
+import json
 import telegram
 from services.AtlasService import *
 
 
 class TelegramBase:
     config = get_config()
-    dir_path = os.path.dirname(os.path.realpath(__file__))
     bot = None
     token = None
     chat_id = None
     prepares = []
+    is_webhook_set = False
 
     def __init__(self, settings):
-        self.settings = settings
+        # attr
+        self.delete_cmd = settings.get('delete_cmd', ['000'])
         self.token = settings['token']
         self.chat_id = settings['chat_id']
         self.collection = settings['collection']
+
+        # mongodb
+        self.atlas = AtlasService(settings)
+
+        # telegram bot
         self.set_bot()
-        self.atlas = AtlasService(self.settings)
+        self.check_is_webhook_set()
 
     def set_bot(self):
         self.bot = telegram.Bot(token=self.token)
@@ -29,14 +36,12 @@ class TelegramBase:
     def get_updates(self):
         return self.bot.get_updates()
 
-    def write_prepare(self):
-        for update in self.get_updates():
-            if int(update.message.chat.id) == int(self.chat_id):
-                row = update.to_dict()
-                self.prepares.append(row)
-
     def write(self):
         return self.atlas.write(self.get_updates())
+
+    def write_by_webhook(self, update):
+        updates = [update]
+        return self.atlas.write(updates)
 
     def delete(self):
         for r in self.atlas.get_data_deleted():
@@ -60,3 +65,22 @@ class TelegramBase:
                 # 刪除失敗
                 self.atlas.delete(where={'update_id': update_id}, update={'$set': {'is_deleted': 1}})
                 print(str(e) + '... message_id: ' + str(message_id))
+
+    def check_is_webhook_set(self):
+        json = self.bot.get_webhook_info()
+        r = isinstance(json['url'], str)
+        self.is_webhook_set = r
+
+    def set_webhook(self):
+        listen_webhook_url = '/'.join([self.config['NGROK']['URL'], 'listen_webhook'])
+        b = self.bot.set_webhook(url=listen_webhook_url)
+        msg = "[{}] telegram set_webhook url: {}".format(str(b), listen_webhook_url)
+        return msg
+
+    def listen_webhook(self, dict_update):
+        self.write_by_webhook(dict_update)
+
+        # 檢查是否有刪除關鍵字
+        text = dict_update['message']['text']
+        if text in self.delete_cmd:
+            self.delete()

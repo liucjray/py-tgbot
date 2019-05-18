@@ -18,9 +18,13 @@ class AtlasService:
 
     def write_prepare(self, updates):
         for update in updates:
-            if int(update.message.chat.id) == int(self.settings['chat_id']):
-                row = update.to_dict()
-                self.prepares.append(row)
+            # 統一轉換為 dict
+            if not isinstance(update, dict):
+                update = update.to_dict()
+                
+            # 判斷後寫入
+            if int(update['message']['chat']['id']) == int(self.settings['chat_id']):
+                self.prepares.append(update)
 
     def write(self, updates):
         try:
