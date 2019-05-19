@@ -81,6 +81,6 @@ class TelegramBase:
         self.write_by_webhook(dict_update)
 
         # 檢查是否有刪除關鍵字
-        text = dict_update['message']['text']
+        text = dict_update.get('message', {}).get('text', None)
         if text in self.delete_cmd:
             self.delete()
