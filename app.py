@@ -1,6 +1,5 @@
 from flask import Flask
 from flask import request
-import json
 
 from services.TelegramTR2 import *
 from services.TelegramBG88 import *

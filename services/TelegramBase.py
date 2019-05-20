@@ -1,4 +1,3 @@
-import json
 import telegram
 from services.AtlasService import *
 
