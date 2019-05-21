@@ -65,6 +65,9 @@ class TelegramBase:
                 self.atlas.delete(where={'update_id': update_id}, update={'$set': {'is_deleted': 1}})
                 print(str(e) + '... message_id: ' + str(message_id))
 
+    def read(self):
+        return self.atlas.read()
+
     def check_is_webhook_set(self):
         json = self.bot.get_webhook_info()
         r = isinstance(json['url'], str)

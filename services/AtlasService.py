@@ -21,7 +21,7 @@ class AtlasService:
             # 統一轉換為 dict
             if not isinstance(update, dict):
                 update = update.to_dict()
-                
+
             # 判斷後寫入
             if int(update['message']['chat']['id']) == int(self.settings['chat_id']):
                 self.prepares.append(update)
@@ -38,3 +38,8 @@ class AtlasService:
 
     def delete(self, where={}, update={}):
         self.collection.update_one(where, update)
+
+    def read(self):
+        return self.collection.find()\
+            .sort('update_id', -1)\
+            .limit(100)

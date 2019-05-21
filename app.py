@@ -1,5 +1,5 @@
-from flask import Flask
-from flask import request
+import json
+from flask import Flask, render_template, request
 
 from services.TelegramTR2 import *
 from services.TelegramBG88 import *
@@ -18,6 +18,15 @@ def write_tr2():
 def delete_tr2():
     TelegramTR2().delete()
     return 'OK'
+
+
+@app.route('/read/bg88')
+def read_bg88():
+    docs = TelegramBG88().read()
+    return render_template(
+        'telegram/read.html',
+        docs=docs
+    )
 
 
 @app.route('/write/bg88')
@@ -60,24 +69,19 @@ def listen_webhook():
 
 @app.route('/')
 def index():
-    config = get_config()
-    links = [
-        '<a target="_blank" href="' + config['TG']['UPDATE_URL'] + '">tgbot getUpdates</a>',
-        '<a target="_blank" href="/set_webhook">/set_webhook</a>',
-        '<hr>',
-        '<a target="_blank" href="/write/tr2">/write/tr2</a>',
-        '<a target="_blank" href="/delete/tr2">/delete/tr2</a>',
-        '<hr>',
-        '<a target="_blank" href="/write/bg88">/write/bg88</a>',
-        '<a target="_blank" href="/delete/bg88">/delete/bg88</a>',
-        '<hr>',
-        '<a target="_blank" href="/write/test">/write/test</a>',
-        '<a target="_blank" href="/delete/test">/delete/test</a>',
-    ]
-    html = ''
-    for link in links:
-        html += link + '<br>'
-    return html
+    return render_template(
+        'index.html',
+        config=get_config()
+    )
+
+
+@app.template_filter('ts_to_date')
+def ts_to_date(ts):
+    from datetime import datetime
+    import pytz
+    utc_moment_naive = datetime.utcfromtimestamp(ts)
+    utc_moment = utc_moment_naive.replace(tzinfo=pytz.utc)
+    return utc_moment.astimezone(pytz.timezone('Asia/Taipei')).strftime("%Y-%m-%d %H:%M:%S")
 
 
 if __name__ == '__main__':

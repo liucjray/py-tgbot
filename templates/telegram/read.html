@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Python Telegram Bot</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+          integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+</head>
+<body>
+<table class="table table-bordered table-striped custom_table">
+    <thead>
+    <tr class="headings">
+        <th>is_deleted</th>
+        <th>update_id</th>
+        <th>message.date</th>
+        <th>message.from.first_name+last_name</th>
+        <th>message.text</th>
+    </tr>
+    </thead>
+    <tbody class="table-hover">
+    {% for doc in docs %}
+        <tr class="success">
+            <td>{{ '%s' % 'Y' if doc.is_deleted == 1 else 'N' }}</td>
+            <td>{{ doc['update_id'] }}</td>
+            <td>{{ doc['message']['date']|ts_to_date }}</td>
+            <td>{{ doc['message']['from']['first_name'] }} {{ doc['message']['from']['last_name'] }}</td>
+            <td>{{ doc['message']['text'] }}</td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>
+</body>
+</html>
