@@ -12,12 +12,12 @@ class AtlasService:
         self.collection = self.get_collection(self.settings['collection'])
 
     def get_collection(self, collection):
-        print(collection)
         client = MongoClient(self.config['MONGODB']['CONNECTION_ATLAS'])
         mongo_collection = client.get_database(self.config['MONGODB']['DB'])[collection]
         return mongo_collection
 
     def write_prepare(self, updates):
+        self.prepares = []
         for update in updates:
             # 統一轉換為 dict
             if not isinstance(update, dict):
@@ -25,16 +25,13 @@ class AtlasService:
 
             # 判斷後寫入
             if int(update['message']['chat']['id']) == int(self.settings['chat_id']):
-                print(self.settings['chat_id'], update['message']['chat']['id'])
                 self.prepares.append(update)
 
     def write(self, updates):
         try:
             self.write_prepare(updates)
-            if not self.prepares:
+            if self.prepares:
                 self.collection.insert_many(self.prepares, ordered=False)
-            else:
-                print('self.prepares is empty.')
         except Exception as e:
             print(__file__, e)
 
