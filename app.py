@@ -8,48 +8,40 @@ from services.TelegramTest import *
 app = Flask(__name__)
 
 
-@app.route('/write/tr2')
-def write_tr2():
-    TelegramTR2().write()
-    return 'OK'
-
-
-@app.route('/delete/tr2')
-def delete_tr2():
-    TelegramTR2().delete()
-    return 'OK'
-
-
-@app.route('/read/bg88')
-def read_bg88():
-    docs = TelegramBG88().read()
+@app.route('/read/<name>')
+def read(name):
+    docs = []
+    if name == 'test':
+        docs = TelegramTest().read()
+    if name == 'bg88':
+        docs = TelegramBG88().read()
+    if name == 'tr2':
+        docs = TelegramTR2().read()
     return render_template(
         'telegram/read.html',
         docs=docs
     )
 
 
-@app.route('/write/bg88')
-def write_bg88():
-    TelegramBG88().write()
+@app.route('/write/<name>')
+def write(name):
+    if name == 'test':
+        TelegramTest().write()
+    if name == 'bg88':
+        TelegramBG88().write()
+    if name == 'tr2':
+        TelegramTR2().write()
     return 'OK'
 
 
-@app.route('/delete/bg88')
-def delete_bg88():
-    TelegramBG88().delete()
-    return 'OK'
-
-
-@app.route('/write/test')
-def write_test():
-    TelegramTest().write()
-    return 'OK'
-
-
-@app.route('/delete/test')
-def delete_test():
-    TelegramTest().delete()
+@app.route('/delete/<name>')
+def delete(name):
+    if name == 'test':
+        TelegramTest().delete()
+    if name == 'bg88':
+        TelegramBG88().delete()
+    if name == 'tr2':
+        TelegramTR2().delete()
     return 'OK'
 
 
@@ -64,14 +56,17 @@ def listen_webhook():
     # json = request.get_json(force=True)
     d = json.loads(s=request.data)
     TelegramBG88().listen_webhook(d)
+    TelegramTest().listen_webhook(d)
+    TelegramTR2().listen_webhook(d)
     return 'OK'
 
 
-@app.route('/')
+@app.route('/home')
 def index():
     return render_template(
-        'index.html',
-        config=get_config()
+        'home.html',
+        config=get_config(),
+        groups=['tr', 'bg88', 'test']
     )
 
 

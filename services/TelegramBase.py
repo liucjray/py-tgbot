@@ -1,5 +1,5 @@
 import telegram
-from services.AtlasService import *
+from repositories.AtlasService import *
 
 
 class TelegramBase:
@@ -40,7 +40,7 @@ class TelegramBase:
 
     def write_by_webhook(self, update):
         updates = [update]
-        return self.atlas.write(updates)
+        self.atlas.write(updates)
 
     def delete(self):
         for r in self.atlas.get_data_deleted():
