@@ -40,6 +40,8 @@ class AtlasService:
         self.collection.update_one(where, update)
 
     def read(self):
-        return self.collection.find()\
+        limit = self.config['MONGODB'].getint('READ_DOCS_LIMIT', 200)
+        return self.collection\
+            .find()\
             .sort('update_id', -1)\
-            .limit(100)
+            .limit(limit)
