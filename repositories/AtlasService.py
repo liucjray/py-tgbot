@@ -35,7 +35,7 @@ class AtlasService:
         except Exception as e:
             print(__file__, e)
 
-    def get_data_deleted(self):
+    def get_data_exist(self):
         return self.collection.find({'is_deleted': None})
 
     def delete(self, where={}, update={}):

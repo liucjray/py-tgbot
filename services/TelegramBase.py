@@ -43,7 +43,7 @@ class TelegramBase:
         self.atlas.write(updates)
 
     def delete(self):
-        for r in self.atlas.get_data_deleted():
+        for r in self.atlas.get_data_exist():
             # before delete
             text = r.get('message.text') if 'message.text' in r else 'Not text or not exist.'
             is_deleted = r.get('is_deleted') if 'is_deleted' in r else 0
