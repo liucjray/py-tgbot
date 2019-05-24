@@ -95,12 +95,12 @@ class TelegramBase:
         # 檢查是否有 tag 關鍵字
         if self.tag_cmd is not None:
             if text in self.tag_cmd:
-                self.tag()
+                self.tag(text)
 
         # 檢查是否有 sync 關鍵字
         if self.sync_cmd is not None:
             if text in self.sync_cmd:
-                self.vcs_sync()
+                self.vcs_sync(text)
 
     def send_message(self, message):
         self.bot.send_message(self.chat_id, message)

@@ -17,18 +17,25 @@ class TelegramTest(TelegramBase):
             'chat_id': self.chat_id,
             'collection': 'test',
             'delete_cmd': ['test', 'del'],
-            'sync_cmd': ['/gssync'],
+            'sync_cmd': ['/gssync', '/gcsync', '/owsync', '/owusync'],
         }
         super(TelegramTest, self).__init__(settings)
 
-    def set_vcs(self):
+    def set_vcs(self, path):
         settings = {
-            'path': self.config['VCS']['GS_PATH'],
+            'path': path,
             'bot': self.get_bot(),
             'chat_id': self.chat_id,
         }
         self.vcs = SyncGitSvn(settings)
 
-    def vcs_sync(self):
-        self.set_vcs()
+    def vcs_sync(self, text):
+        if text == '/gssync':
+            self.set_vcs(self.config['VCS']['GS_PATH'])
+        if text == '/gcsync':
+            self.set_vcs(self.config['VCS']['GC_PATH'])
+        if text == '/owsync':
+            self.set_vcs(self.config['VCS']['OW_PATH'])
+        if text == '/owusync':
+            self.set_vcs(self.config['VCS']['OWU_PATH'])
         self.vcs.sync()
