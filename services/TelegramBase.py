@@ -12,10 +12,13 @@ class TelegramBase:
 
     def __init__(self, settings):
         # attr
-        self.delete_cmd = settings.get('delete_cmd', ['000'])
         self.token = settings['token']
         self.chat_id = settings['chat_id']
         self.collection = settings['collection']
+
+        # attr cmd
+        self.delete_cmd = settings.get('delete_cmd', ['000'])
+        self.tag_cmd = settings.get('tag_cmd', None)
 
         # mongodb
         self.atlas = AtlasService(settings)
@@ -82,10 +85,16 @@ class TelegramBase:
     def listen_webhook(self, dict_update):
         self.write_by_webhook(dict_update)
 
-        # 檢查是否有刪除關鍵字
         text = dict_update.get('message', {}).get('text', None)
+
+        # 檢查是否有刪除關鍵字
         if text in self.delete_cmd:
             self.delete()
+
+        # 檢查是否有 tag 關鍵字
+        if self.tag_cmd is not None:
+            if text in self.tag_cmd:
+                self.tag()
 
     def send_message(self, message):
         self.bot.send_message(self.chat_id, message)

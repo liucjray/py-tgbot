@@ -40,6 +40,8 @@ def read(name):
         docs = TelegramBG88().read()
     if name == 'tr2':
         docs = TelegramTR2().read()
+    if name == 'gs':
+        docs = TelegramGS().read()
     return render_template(
         'telegram/read.html',
         docs=docs
@@ -54,6 +56,8 @@ def write(name):
         TelegramBG88().write()
     if name == 'tr2':
         TelegramTR2().write()
+    if name == 'gs':
+        TelegramGS().write()
     return 'OK'
 
 
@@ -65,6 +69,8 @@ def delete(name):
         TelegramBG88().delete()
     if name == 'tr2':
         TelegramTR2().delete()
+    if name == 'gs':
+        TelegramGS().delete()
     return 'OK'
 
 
@@ -81,6 +87,7 @@ def listen_webhook():
     TelegramBG88().listen_webhook(d)
     TelegramTest().listen_webhook(d)
     TelegramTR2().listen_webhook(d)
+    TelegramGS().listen_webhook(d)
     return 'OK'
 
 
@@ -89,7 +96,7 @@ def index():
     return render_template(
         'home.html',
         config=get_config(),
-        groups=['tr', 'bg88', 'test']
+        groups=['gs', 'test', 'tr2', 'bg88']
     )
 
 

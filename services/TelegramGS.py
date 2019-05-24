@@ -16,7 +16,6 @@ class TelegramGS(TelegramBase):
             'token': self.token,
             'chat_id': self.chat_id,
             'collection': 'gs',
-            'delete_cmd': ['test', 'del'],
             'tag_cmd': ['gstag'],
         }
         super(TelegramGS, self).__init__(settings)
