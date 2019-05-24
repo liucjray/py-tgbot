@@ -1,4 +1,4 @@
-from services.TelegramBase import *
+from services.telegram.TelegramBase import *
 
 
 class TelegramTR2(TelegramBase):

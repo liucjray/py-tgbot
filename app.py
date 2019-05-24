@@ -1,11 +1,10 @@
 import json
-import asyncio
 from flask import Flask, render_template, request
 
-from services.TelegramTR2 import *
-from services.TelegramBG88 import *
-from services.TelegramTest import *
-from services.TelegramGS import *
+from services.telegram.TelegramTR2 import *
+from services.telegram.TelegramBG88 import *
+from services.telegram.TelegramTest import *
+from services.telegram.TelegramGS import *
 
 app = Flask(__name__)
 

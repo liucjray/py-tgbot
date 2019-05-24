@@ -1,25 +1,24 @@
-from services.TelegramBase import *
-from services.SyncGitSvn import *
+from services.telegram.TelegramBase import *
+from services.vcs.SyncGitSvn import *
 
 
-class TelegramTest(TelegramBase):
+class TelegramGS(TelegramBase):
     vcs = None
     chat_id = None
     token = None
 
     def __init__(self):
 
+        self.chat_id = self.config['TG']['CHAT_ID_GS']
         self.token = self.config['TG']['ACCESS_TOKEN_GYOABOT']
-        self.chat_id = self.config['TG']['CHAT_ID_TEST']
 
         settings = {
             'token': self.token,
             'chat_id': self.chat_id,
-            'collection': 'test',
-            'delete_cmd': ['test', 'del'],
-            'sync_cmd': ['/gssync'],
+            'collection': 'gs',
+            'tag_cmd': ['gstag', '/gstag'],
         }
-        super(TelegramTest, self).__init__(settings)
+        super(TelegramGS, self).__init__(settings)
 
     def set_vcs(self):
         settings = {
@@ -29,6 +28,6 @@ class TelegramTest(TelegramBase):
         }
         self.vcs = SyncGitSvn(settings)
 
-    def vcs_sync(self):
+    def tag(self):
         self.set_vcs()
-        self.vcs.sync()
+        self.vcs.tag()
