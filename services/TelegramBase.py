@@ -86,3 +86,6 @@ class TelegramBase:
         text = dict_update.get('message', {}).get('text', None)
         if text in self.delete_cmd:
             self.delete()
+
+    def send_message(self, message):
+        self.bot.send_message(self.chat_id, message)

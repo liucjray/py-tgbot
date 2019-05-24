@@ -1,11 +1,34 @@
 import json
+import asyncio
 from flask import Flask, render_template, request
 
 from services.TelegramTR2 import *
 from services.TelegramBG88 import *
 from services.TelegramTest import *
+from services.TelegramGS import *
 
 app = Flask(__name__)
+
+
+@app.route('/send/test')
+def delete_async():
+    bot = TelegramTest().get_bot()
+    from telegram.ext import Updater
+    u = Updater(bot=bot, use_context=True)
+    q = u.job_queue
+    for i in range(10):
+        TelegramTest().send_message('test' + str(i))
+        print(i)
+        # jq.run_once(TelegramTest().send_message('test'), 0.1)
+
+    return 'qqq'
+
+
+@app.route('/tag/daily/<project>')
+def tag_daily(project):
+    if project == 'gs':
+        TelegramGS().tag()
+    return project
 
 
 @app.route('/read/<name>')
