@@ -19,6 +19,7 @@ class TelegramBase:
         # attr cmd
         self.delete_cmd = settings.get('delete_cmd', ['000'])
         self.tag_cmd = settings.get('tag_cmd', None)
+        self.sync_cmd = settings.get('sync_cmd', None)
 
         # mongodb
         self.atlas = AtlasService(settings)
@@ -95,6 +96,11 @@ class TelegramBase:
         if self.tag_cmd is not None:
             if text in self.tag_cmd:
                 self.tag()
+
+        # 檢查是否有 sync 關鍵字
+        if self.sync_cmd is not None:
+            if text in self.sync_cmd:
+                self.vcs_sync()
 
     def send_message(self, message):
         self.bot.send_message(self.chat_id, message)
