@@ -95,7 +95,7 @@ class TelegramBase:
         # 檢查是否有 tag 關鍵字
         if self.tag_cmd is not None:
             if text in self.tag_cmd:
-                self.tag(text)
+                self.tag()
 
         # 檢查是否有 sync 關鍵字
         if self.sync_cmd is not None:

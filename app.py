@@ -1,6 +1,7 @@
 import json
 from flask import Flask, render_template, request
 
+from services.telegram.TelegramSTR import *
 from services.telegram.TelegramTR2 import *
 from services.telegram.TelegramBG88 import *
 from services.telegram.TelegramTest import *
@@ -86,6 +87,7 @@ def listen_webhook():
     TelegramBG88().listen_webhook(d)
     TelegramTest().listen_webhook(d)
     TelegramTR2().listen_webhook(d)
+    TelegramSTR().listen_webhook(d)
     TelegramGS().listen_webhook(d)
     return 'OK'
 
