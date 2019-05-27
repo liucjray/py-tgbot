@@ -16,7 +16,7 @@ class TelegramTest(TelegramBase):
             'token': self.token,
             'chat_id': self.chat_id,
             'collection': 'test',
-            'delete_cmd': ['test', 'del'],
+            'delete_cmd': ['/del'],
             'sync_cmd': ['/gssync', '/gcsync', '/owsync', '/owusync'],
         }
         super(TelegramTest, self).__init__(settings)
