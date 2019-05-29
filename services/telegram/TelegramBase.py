@@ -87,20 +87,23 @@ class TelegramBase:
         self.write_by_webhook(dict_update)
 
         text = dict_update.get('message', {}).get('text', None)
+        chat_id = dict_update.get('message', {}).get('chat', {}).get('id', None)
 
-        # 檢查是否有刪除關鍵字
-        if text in self.delete_cmd:
-            self.delete()
+        # 驗證 chat_id
+        if int(chat_id) == int(self.chat_id):
+            # 檢查是否有刪除關鍵字
+            if text in self.delete_cmd:
+                self.delete()
 
-        # 檢查是否有 tag 關鍵字
-        if self.tag_cmd is not None:
-            if text in self.tag_cmd:
-                self.tag()
+            # 檢查是否有 tag 關鍵字
+            if self.tag_cmd is not None:
+                if text in self.tag_cmd:
+                    self.tag()
 
-        # 檢查是否有 sync 關鍵字
-        if self.sync_cmd is not None:
-            if text in self.sync_cmd:
-                self.vcs_sync(text)
+            # 檢查是否有 sync 關鍵字
+            if self.sync_cmd is not None:
+                if text in self.sync_cmd:
+                    self.vcs_sync(text)
 
     def send_message(self, message):
         self.bot.send_message(self.chat_id, message)
