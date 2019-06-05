@@ -87,7 +87,7 @@ class TelegramBase:
         self.write_by_webhook(dict_update)
 
         text = dict_update.get('message', {}).get('text', None)
-        chat_id = dict_update.get('message', {}).get('chat', {}).get('id', None)
+        chat_id = dict_update.get('message', {}).get('chat', {}).get('id', 0)
 
         # 驗證 chat_id
         if int(chat_id) == int(self.chat_id):

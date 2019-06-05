@@ -6,6 +6,7 @@ from services.telegram.TelegramTR2 import *
 from services.telegram.TelegramBG88 import *
 from services.telegram.TelegramTest import *
 from services.telegram.TelegramGS import *
+from services.telegram.TelegramGC import *
 
 app = Flask(__name__)
 
@@ -42,6 +43,8 @@ def read(name):
         docs = TelegramTR2().read()
     if name == 'gs':
         docs = TelegramGS().read()
+    if name == 'gc':
+        docs = TelegramGC().read()
     return render_template(
         'telegram/read.html',
         docs=docs
@@ -89,6 +92,7 @@ def listen_webhook():
     TelegramTR2().listen_webhook(d)
     TelegramSTR().listen_webhook(d)
     TelegramGS().listen_webhook(d)
+    TelegramGC().listen_webhook(d)
     return 'OK'
 
 
