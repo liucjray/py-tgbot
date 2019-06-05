@@ -1,13 +1,15 @@
+import time
 import telegram
 from repositories.AtlasService import *
+from services.AioHttpService import *
 
 
 class TelegramBase:
     config = get_config()
-    bot = None
-    token = None
-    chat_id = None
+    bot = aiohttp = None
+    token = chat_id = None
     prepares = []
+    delete_prepares = []
     is_webhook_set = False
 
     def __init__(self, settings):
@@ -28,6 +30,9 @@ class TelegramBase:
         self.set_bot()
         self.check_is_webhook_set()
 
+        # async request
+        self.aiohttp = AioHttpService()
+
     def set_bot(self):
         self.bot = telegram.Bot(token=self.token)
 
@@ -46,7 +51,7 @@ class TelegramBase:
         updates = [update]
         self.atlas.write(updates)
 
-    def delete(self):
+    def delete_prepare(self):
         for r in self.atlas.get_data_exist():
             # before delete
             text = r.get('message.text') if 'message.text' in r else 'Not text or not exist.'
@@ -55,19 +60,40 @@ class TelegramBase:
                 print('text: [' + text + '] has been deleted.')
                 continue
 
-            # delete telegram message
-            update_id = r['update_id']
-            chat_id = r['message']['chat']['id']
-            message_id = r['message']['message_id']
-            try:
-                b = self.bot.delete_message(chat_id, message_id)
-                # 删除成功
-                if b is True:
-                    self.atlas.delete(where={'update_id': update_id}, update={'$set': {'is_deleted': 1}})
-            except Exception as e:
-                # 刪除失敗
+            # prepare list of delete
+            d = {
+                'update_id': r['update_id'],
+                'chat_id': r['message']['chat']['id'],
+                'message_id': r['message']['message_id'],
+            }
+            d['url'] = self.build_delete_url(d)
+            self.delete_prepares.append(d)
+
+    def build_delete_url(self, delete_dict):
+        url = 'https://api.telegram.org/bot{}/deleteMessage?chat_id={}&message_id={}'.format(
+            self.token,
+            delete_dict['chat_id'],
+            delete_dict['message_id'],
+        )
+        return url
+
+    def delete_exec(self):
+        t1 = time.time()
+        if self.delete_prepares:
+            # telegram delete requests
+            loop = asyncio.get_event_loop()
+            loop.run_until_complete(self.aiohttp.main(loop, self.delete_prepares))
+            loop.close()
+
+            # database update delete rows
+            for d in self.delete_prepares:
+                update_id = d['update_id']
                 self.atlas.delete(where={'update_id': update_id}, update={'$set': {'is_deleted': 1}})
-                print(str(e) + '... message_id: ' + str(message_id))
+        print("Async delete total time:", time.time() - t1)
+
+    def delete(self):
+        self.delete_prepare()
+        self.delete_exec()
 
     def read(self):
         return self.atlas.read()
