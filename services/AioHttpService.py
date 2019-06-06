@@ -4,6 +4,13 @@ import aiohttp
 
 class AioHttpService:
 
+    def handler(self, dataset):
+        new_loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(new_loop)
+        loop = asyncio.get_event_loop()
+        loop.run_until_complete(self.main(loop, dataset))
+        loop.close()
+
     async def job(self, session, url):
         response = await session.get(url)  # 等待并切换
         # print(response)

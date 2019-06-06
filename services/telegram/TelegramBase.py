@@ -81,11 +81,7 @@ class TelegramBase:
         t1 = time.time()
         if self.delete_prepares:
             # telegram delete requests
-            new_loop = asyncio.new_event_loop()
-            asyncio.set_event_loop(new_loop)
-            loop = asyncio.get_event_loop()
-            loop.run_until_complete(self.aiohttp.main(loop, self.delete_prepares))
-            loop.close()
+            self.aiohttp.handler(self.delete_prepares)
 
             # database update delete rows
             for d in self.delete_prepares:
