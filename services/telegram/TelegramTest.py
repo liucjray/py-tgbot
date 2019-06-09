@@ -18,6 +18,7 @@ class TelegramTest(TelegramBase):
             'collection': 'test',
             'delete_cmd': ['/del'],
             'sync_cmd': ['/gssync', '/gcsync', '/owsync', '/owusync'],
+            'gtts_cmd': ['/say:'],
         }
         super(TelegramTest, self).__init__(settings)
 

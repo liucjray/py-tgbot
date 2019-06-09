@@ -8,5 +8,6 @@ class TelegramBG88(TelegramBase):
             'chat_id': self.config['TG']['CHAT_ID_BG88'],
             'collection': 'bg88',
             'delete_cmd': ['000', 'BZ', 'bz'],
+            'gtts_cmd': ['/say:'],
         }
         super(TelegramBG88, self).__init__(settings)

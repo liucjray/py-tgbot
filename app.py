@@ -96,8 +96,14 @@ def listen_webhook():
     return 'OK'
 
 
+@app.route('/voice/<text>')
+def index(text):
+    TelegramTest().send_tts_audio(text)
+    return 'OK'
+
+
 @app.route('/home')
-def index():
+def home():
     return render_template(
         'home.html',
         config=get_config(),

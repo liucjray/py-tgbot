@@ -2,6 +2,7 @@ import time
 import telegram
 from repositories.AtlasService import *
 from services.AioHttpService import *
+from services.google.GttsService import *
 
 
 class TelegramBase:
@@ -22,6 +23,7 @@ class TelegramBase:
         self.delete_cmd = settings.get('delete_cmd', ['000'])
         self.tag_cmd = settings.get('tag_cmd', None)
         self.sync_cmd = settings.get('sync_cmd', None)
+        self.gtts_cmd = settings.get('gtts_cmd', None)
 
         # mongodb
         self.atlas = AtlasService(settings)
@@ -32,6 +34,9 @@ class TelegramBase:
 
         # async request
         self.aiohttp = AioHttpService()
+
+        # Google gtts
+        self.gtts = GttsService(self.config)
 
     def set_bot(self):
         self.bot = telegram.Bot(token=self.token)
@@ -129,5 +134,20 @@ class TelegramBase:
                 if text in self.sync_cmd:
                     self.vcs_sync(text)
 
+            # 檢查是否有 ttx 關鍵字
+            if self.gtts_cmd is not None:
+                if text[0:len(self.gtts_cmd[0])] == self.gtts_cmd[0]:
+                    new_text = text[len(self.gtts_cmd[0]):len(text)]
+                    self.send_gtts_audio(new_text)
+
     def send_message(self, message):
         self.bot.send_message(self.chat_id, message)
+
+    def send_audio(self, file_path):
+        if not os.path.exists(file_path):
+            raise RuntimeError('File not exists.')
+        self.bot.send_audio(self.chat_id, audio=open(file_path, 'rb'))
+
+    def send_gtts_audio(self, text, lang=''):
+        file_path = self.gtts.get_file(text, lang)
+        self.send_audio(file_path)
