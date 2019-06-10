@@ -18,6 +18,11 @@ class AtlasService:
 
     def write_prepare(self, updates):
         self.prepares = []
+
+        # 若只傳入一筆 dict 資料則使用 list 包裝
+        if isinstance(updates, dict):
+            updates = [updates]
+
         for update in updates:
             # 統一轉換為 dict
             if not isinstance(update, dict):
@@ -37,6 +42,12 @@ class AtlasService:
 
     def get_data_exist(self):
         return self.collection.find({'is_deleted': None})
+
+    def find(self, where={}):
+        return self.collection.find(where)
+
+    def find_one(self, where={}):
+        return self.collection.find_one(where)
 
     def delete(self, where={}, update={}):
         self.collection.update_one(where, update)

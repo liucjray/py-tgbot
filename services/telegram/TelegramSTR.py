@@ -8,6 +8,6 @@ class TelegramSTR(TelegramBase):
             'chat_id': self.config['TG']['CHAT_ID_STR'],
             'collection': 'str',
             'delete_cmd': ['/del'],
-            'gtts_cmd': ['/say:'],
+            'gtts_cmd': ['/say='],
         }
         super(TelegramSTR, self).__init__(settings)

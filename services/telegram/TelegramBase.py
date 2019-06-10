@@ -3,6 +3,7 @@ import telegram
 from repositories.AtlasService import *
 from services.AioHttpService import *
 from services.google.GttsService import *
+from services.CronService import *
 
 
 class TelegramBase:
@@ -24,6 +25,7 @@ class TelegramBase:
         self.tag_cmd = settings.get('tag_cmd', None)
         self.sync_cmd = settings.get('sync_cmd', None)
         self.gtts_cmd = settings.get('gtts_cmd', None)
+        self.jobs_cmd = settings.get('jobs_cmd', None)
 
         # mongodb
         self.atlas = AtlasService(settings)
@@ -37,6 +39,9 @@ class TelegramBase:
 
         # Google gtts
         self.gtts = GttsService(self.config)
+
+        # cron
+        self.cron = CronService({"chat_id": settings['chat_id']})
 
     def set_bot(self):
         self.bot = telegram.Bot(token=self.token)
@@ -86,12 +91,13 @@ class TelegramBase:
         t1 = time.time()
         if self.delete_prepares:
             # telegram delete requests
-            self.aiohttp.handler(self.delete_prepares)
+            results = self.aiohttp.handler(self.delete_prepares)
 
-            # database update delete rows
-            for d in self.delete_prepares:
-                update_id = d['update_id']
-                self.atlas.delete(where={'update_id': update_id}, update={'$set': {'is_deleted': 1}})
+            # database update delete rows (success / not found)
+            for d in results:
+                if d and d.get('message_id'):
+                    message_id = d.get('message_id', 0)
+                    self.atlas.delete(where={'message.message_id': int(message_id)}, update={'$set': {'is_deleted': 1}})
         print("Async delete total time:", time.time() - t1)
 
     def delete(self):
@@ -119,7 +125,7 @@ class TelegramBase:
         chat_id = dict_update.get('message', {}).get('chat', {}).get('id', 0)
 
         # 驗證 chat_id
-        if int(chat_id) == int(self.chat_id):
+        if int(chat_id) == int(self.chat_id) and text is not None:
             # 檢查是否有刪除關鍵字
             if text in self.delete_cmd:
                 self.delete()
@@ -139,6 +145,16 @@ class TelegramBase:
                 if text[0:len(self.gtts_cmd[0])] == self.gtts_cmd[0]:
                     new_text = text[len(self.gtts_cmd[0]):len(text)]
                     self.send_gtts_audio(new_text)
+
+            # 檢查 jobs 關鍵字
+            if self.jobs_cmd is not None:
+                # todo: 驗證輸入格式
+                # format /job=text,time
+                if text[0:len(self.jobs_cmd[0])] == self.jobs_cmd[0]:
+                    j_text = text[len(self.jobs_cmd[0]): text.find(',')]
+                    j_time = text[text.find(',') + 1: len(text)]
+                    job = {"cron": {"text": j_text, "time": j_time, "done": 0}}
+                    self.cron.add(dict_update, job)
 
     def send_message(self, message):
         self.bot.send_message(self.chat_id, message)
