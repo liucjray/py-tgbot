@@ -32,7 +32,7 @@ class TelegramBase:
 
         # telegram bot
         self.set_bot()
-        self.check_is_webhook_set()
+        # self.check_is_webhook_set()
 
         # async request
         self.aiohttp = AioHttpService()
@@ -42,6 +42,8 @@ class TelegramBase:
 
         # cron
         self.cron = CronService({"chat_id": settings['chat_id']})
+
+        self.bot2 = TelegramBot({})
 
     def set_bot(self):
         self.bot = telegram.Bot(token=self.token)
@@ -72,20 +74,12 @@ class TelegramBase:
 
             # prepare list of delete
             d = {
-                'update_id': r['update_id'],
+                # 'update_id': r['update_id'],
                 'chat_id': r['message']['chat']['id'],
                 'message_id': r['message']['message_id'],
             }
-            d['url'] = self.build_delete_url(d)
+            d['url'] = self.bot2.build_delete_url(d)
             self.delete_prepares.append(d)
-
-    def build_delete_url(self, delete_dict):
-        url = 'https://api.telegram.org/bot{}/deleteMessage?chat_id={}&message_id={}'.format(
-            self.token,
-            delete_dict['chat_id'],
-            delete_dict['message_id'],
-        )
-        return url
 
     def delete_exec(self):
         t1 = time.time()
@@ -113,10 +107,7 @@ class TelegramBase:
         self.is_webhook_set = r
 
     def set_webhook(self):
-        listen_webhook_url = '/'.join([self.config['NGROK']['URL'], 'listen_webhook'])
-        b = self.bot.set_webhook(url=listen_webhook_url)
-        msg = "[{}] telegram set_webhook url: {}".format(str(b), listen_webhook_url)
-        return msg
+        return self.bot2.set_webhook()
 
     def listen_webhook(self, dict_update):
         self.write_by_webhook(dict_update)
@@ -144,26 +135,42 @@ class TelegramBase:
             if self.gtts_cmd is not None:
                 if text[0:len(self.gtts_cmd[0])] == self.gtts_cmd[0]:
                     new_text = text[len(self.gtts_cmd[0]):len(text)]
-                    self.send_gtts_audio(new_text)
+                    file_path = self.get_gtts_audio(new_text)
+                    r = self.bot2.send_audio(chat_id, file_path)
+
+                    # bot 訊息發後須寫入訊息，之後才刪的到
+                    u = self.bot2.format_send_audio_message_resp(r)
+                    self.write_by_webhook(u)
 
             # 檢查 jobs 關鍵字
             if self.jobs_cmd is not None:
-                # todo: 驗證輸入格式
-                # format /job=text,time
                 if text[0:len(self.jobs_cmd[0])] == self.jobs_cmd[0]:
-                    j_text = text[len(self.jobs_cmd[0]): text.find(',')]
-                    j_time = text[text.find(',') + 1: len(text)]
-                    job = {"cron": {"text": j_text, "time": j_time, "done": 0}}
-                    self.cron.add(dict_update, job)
+                    self.add_job(dict_update, text)
 
     def send_message(self, message):
-        self.bot.send_message(self.chat_id, message)
+        self.bot2.send_message(self.chat_id, message)
 
-    def send_audio(self, file_path):
-        if not os.path.exists(file_path):
-            raise RuntimeError('File not exists.')
-        self.bot.send_audio(self.chat_id, audio=open(file_path, 'rb'))
+    def get_gtts_audio(self, text, lang=''):
+        return self.gtts.get_file(text, lang)
 
-    def send_gtts_audio(self, text, lang=''):
-        file_path = self.gtts.get_file(text, lang)
-        self.send_audio(file_path)
+    def add_job(self, updates, text):
+        # todo: 驗證輸入格式 text
+        # format /job=text,time
+        j_text = text[len(self.jobs_cmd[0]): text.find('|')]
+        j_time = text[text.find('|') + 1: len(text)]
+
+        sample_time = '20190102030405'
+        if len(j_time) == len(sample_time) and j_time.isdigit():
+            job = {"cron": {"text": j_text, "time": j_time, "done": 0}}
+            self.cron.add(updates, job)
+            msg = '定時任務新增成功.\n===================\n時間: {}\n訊息: {}'.format(j_time, j_text)
+        else:
+            msg = '定時任務新增失敗.'
+
+        # 回傳加入排程資訊
+        r = self.bot2.send_message(self.chat_id, msg)
+
+        # bot 訊息發後須寫入訊息，之後才刪的到
+        u = self.bot2.format_send_message_resp(r)
+        self.write_by_webhook(u)
+

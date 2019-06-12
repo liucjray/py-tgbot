@@ -1,5 +1,6 @@
 import json
 from flask import Flask, render_template, request
+from flask_apscheduler import APScheduler
 
 from services.telegram.TelegramSTR import *
 from services.telegram.TelegramTR2 import *
@@ -7,22 +8,28 @@ from services.telegram.TelegramBG88 import *
 from services.telegram.TelegramTest import *
 from services.telegram.TelegramGS import *
 from services.telegram.TelegramGC import *
+from services.CronService import *
+from config.ConfigAPSchedule import *
 
-app = Flask(__name__)
+
+def create_app():
+    app = Flask(__name__)
+    app.config.from_object(Config())
+    # 註冊 APScheduler
+    scheduler = APScheduler()
+    scheduler.init_app(app)
+    scheduler.start()
+    return app
 
 
-@app.route('/send/test')
-def delete_async():
-    bot = TelegramTest().get_bot()
-    from telegram.ext import Updater
-    u = Updater(bot=bot, use_context=True)
-    q = u.job_queue
-    for i in range(10):
-        TelegramTest().send_message('test' + str(i))
-        print(i)
-        # jq.run_once(TelegramTest().send_message('test'), 0.1)
+app = create_app()
+scheduler = APScheduler()
 
-    return 'qqq'
+
+# cron examples
+@scheduler.task('cron', id='do_job_2', minute='*')
+def job2():
+    print('Job 2 executed')
 
 
 @app.route('/tag/daily/<project>')
@@ -45,6 +52,8 @@ def read(name):
         docs = TelegramGS().read()
     if name == 'gc':
         docs = TelegramGC().read()
+    if name == 'str':
+        docs = TelegramSTR().read()
     return render_template(
         'telegram/read.html',
         docs=docs
@@ -96,12 +105,6 @@ def listen_webhook():
     return 'OK'
 
 
-@app.route('/voice/<text>')
-def index(text):
-    TelegramTest().send_tts_audio(text)
-    return 'OK'
-
-
 @app.route('/home')
 def home():
     return render_template(
@@ -109,6 +112,41 @@ def home():
         config=get_config(),
         groups=['gs', 'test', 'tr2', 'bg88']
     )
+
+
+@app.route('/send/<name>', methods=['POST'])
+def send(name):
+    text = request.form.get('text')
+    if text:
+        TelegramTest().send_message(text)
+    return 'OK'
+
+
+@app.route('/cron/add', methods=['POST'])
+def cron_add():
+    update = json.loads(s=request.data)
+    if update:
+        CronService({"chat_id": -320735075}).add(update, {"time": "2019-10-10 10:10:10", "done": 0})
+    return 'OK'
+
+
+@app.route('/cron/list', methods=['POST'])
+def cron_list():
+    for x in CronService().get_jobs():
+        print(x)
+    return 'OK'
+
+
+@app.route('/cron/exec', methods=['POST'])
+def cron_exec():
+    CronService().exec()
+    return 'OK'
+
+
+@app.route('/bot', methods=['GET'])
+def test():
+    TelegramBot({}).check_is_webhook_set()
+    return 'OK'
 
 
 @app.template_filter('ts_to_date')

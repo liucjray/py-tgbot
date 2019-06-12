@@ -33,23 +33,9 @@
     {% for group in groups %}
         <tr class="success">
             <td>讀取 {{ group }} (Atlas)</td>
-            <td>/write/bg88</td>
+            <td>/read/{{ group }}</td>
             <td>
                 <a class="btn btn-success" target="_blank" href="/read/{{ group }}">执行</a>
-            </td>
-        </tr>
-        <tr class="success">
-            <td>寫入 {{ group }} (Atlas)</td>
-            <td>/write/{{ group }}</td>
-            <td>
-                <a class="btn btn-warning" target="_blank" href="/write/{{ group }}">执行</a>
-            </td>
-        </tr>
-        <tr class="success">
-            <td>刪除 {{ group }} (telegram+Atlas)</td>
-            <td>/delete/{{ group }}</td>
-            <td>
-                <a class="btn btn-danger" target="_blank" href="/delete/{{ group }}">执行</a>
             </td>
         </tr>
     {% endfor %}
