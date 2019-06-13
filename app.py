@@ -14,22 +14,24 @@ from config.ConfigAPSchedule import *
 
 def create_app():
     app = Flask(__name__)
-    app.config.from_object(Config())
+    # app.config.from_object(Config())
     # 註冊 APScheduler
-    scheduler = APScheduler()
-    scheduler.init_app(app)
-    scheduler.start()
+    # scheduler = APScheduler()
+    # scheduler.init_app(app)
+    # scheduler.start()
     return app
 
 
 app = create_app()
-scheduler = APScheduler()
+
+
+# scheduler = APScheduler()
 
 
 # cron examples
-@scheduler.task('cron', id='do_job_2', minute='*')
-def job2():
-    print('Job 2 executed')
+# @scheduler.task('cron', id='do_job_2', minute='*')
+# def job2():
+#     print('Job 2 executed')
 
 
 @app.route('/tag/daily/<project>')
@@ -156,6 +158,11 @@ def ts_to_date(ts):
     utc_moment_naive = datetime.utcfromtimestamp(ts)
     utc_moment = utc_moment_naive.replace(tzinfo=pytz.utc)
     return utc_moment.astimezone(pytz.timezone('Asia/Taipei')).strftime("%Y-%m-%d %H:%M:%S")
+
+
+@app.route('/')
+def index():
+    return 'OK'
 
 
 if __name__ == '__main__':

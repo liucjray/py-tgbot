@@ -1,5 +1,6 @@
 from pymongo import MongoClient
 from config.config import *
+from helpers.Common import *
 
 
 class AtlasService:
@@ -29,7 +30,8 @@ class AtlasService:
                 update = update.to_dict()
 
             # 判斷後寫入
-            if int(update['message']['chat']['id']) == int(self.settings['chat_id']):
+            chat_id = dict_get(update, "message.chat.id", 0)
+            if int(chat_id) == int(self.settings['chat_id']):
                 self.prepares.append(update)
 
     def write(self, updates):

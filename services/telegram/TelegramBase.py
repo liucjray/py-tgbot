@@ -4,6 +4,7 @@ from repositories.AtlasService import *
 from services.AioHttpService import *
 from services.google.GttsService import *
 from services.CronService import *
+from helpers.Common import *
 
 
 class TelegramBase:
@@ -64,6 +65,7 @@ class TelegramBase:
         self.atlas.write(updates)
 
     def delete_prepare(self):
+        a = get_caller(show=True)
         for r in self.atlas.get_data_exist():
             # before delete
             text = r.get('message.text') if 'message.text' in r else 'Not text or not exist.'
@@ -163,9 +165,9 @@ class TelegramBase:
         if len(j_time) == len(sample_time) and j_time.isdigit():
             job = {"cron": {"text": j_text, "time": j_time, "done": 0}}
             self.cron.add(updates, job)
-            msg = '定時任務新增成功.\n===================\n時間: {}\n訊息: {}'.format(j_time, j_text)
+            msg = '[O] 定時任務新增成功\n===================\n時間: {}\n訊息: {}'.format(j_time, j_text)
         else:
-            msg = '定時任務新增失敗.'
+            msg = '[X] 定時任務新增失敗'
 
         # 回傳加入排程資訊
         r = self.bot2.send_message(self.chat_id, msg)

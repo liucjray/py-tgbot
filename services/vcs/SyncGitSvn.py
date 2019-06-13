@@ -26,6 +26,7 @@ class SyncGitSvn:
     def sync(self):
         self.eo("svn update")
         self.sync_git()
+        self.bot.send_message(self.chat_id, 'sync success')
 
     def sync_git(self):
         self.eo("git reset --hard")

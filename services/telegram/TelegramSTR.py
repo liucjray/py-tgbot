@@ -9,5 +9,6 @@ class TelegramSTR(TelegramBase):
             'collection': 'str',
             'delete_cmd': ['/del'],
             'gtts_cmd': ['/say='],
+            'jobs_cmd': ['/job='],
         }
         super(TelegramSTR, self).__init__(settings)
