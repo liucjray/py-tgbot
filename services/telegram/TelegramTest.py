@@ -17,7 +17,7 @@ class TelegramTest(TelegramBase):
             'chat_id': self.chat_id,
             'collection': 'test',
             'delete_cmd': ['/del'],
-            'sync_cmd': ['/gssync', '/gcsync', '/owsync', '/owusync'],
+            'sync_cmd': ['/gssync', '/gcsync', '/owsync', '/owusync', '/oasync'],
             'gtts_cmd': ['/say='],
             'jobs_cmd': ['/job='],
         }
@@ -40,4 +40,6 @@ class TelegramTest(TelegramBase):
             self.set_vcs(self.config['VCS']['OW_PATH'])
         if text == '/owusync':
             self.set_vcs(self.config['VCS']['OWU_PATH'])
+        if text == '/oasync':
+            self.set_vcs(self.config['VCS']['OA_PATH'])
         self.vcs.sync()
