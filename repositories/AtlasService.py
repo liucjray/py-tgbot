@@ -54,6 +54,9 @@ class AtlasService:
     def delete(self, where={}, update={}):
         self.collection.update_one(where, update)
 
+    def update(self, where={}, update={}):
+        self.collection.update_one(where, update)
+
     def read(self):
         limit = self.config['MONGODB'].getint('READ_DOCS_LIMIT', 200)
         return self.collection \

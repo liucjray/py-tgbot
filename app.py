@@ -1,6 +1,4 @@
-import json
 from flask import Flask, render_template, request
-from flask_apscheduler import APScheduler
 
 from services.telegram.TelegramSTR import *
 from services.telegram.TelegramTR2 import *
@@ -9,29 +7,14 @@ from services.telegram.TelegramTest import *
 from services.telegram.TelegramGS import *
 from services.telegram.TelegramGC import *
 from services.CronService import *
-from config.ConfigAPSchedule import *
 
 
 def create_app():
-    app = Flask(__name__)
-    # app.config.from_object(Config())
-    # 註冊 APScheduler
-    # scheduler = APScheduler()
-    # scheduler.init_app(app)
-    # scheduler.start()
-    return app
+    my_app = Flask(__name__)
+    return my_app
 
 
 app = create_app()
-
-
-# scheduler = APScheduler()
-
-
-# cron examples
-# @scheduler.task('cron', id='do_job_2', minute='*')
-# def job2():
-#     print('Job 2 executed')
 
 
 @app.route('/tag/daily/<project>')
