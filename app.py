@@ -18,63 +18,9 @@ def create_app():
 app = create_app()
 
 
-@app.route('/tag/daily/<project>')
-def tag_daily(project):
-    if project == 'gs':
-        TelegramGS().tag()
-    return project
-
-
-@app.route('/read/<name>')
-def read(name):
-    docs = []
-    if name == 'test':
-        docs = TelegramTest().read()
-    if name == 'bg88':
-        docs = TelegramBG88().read()
-    if name == 'tr2':
-        docs = TelegramTR2().read()
-    if name == 'gs':
-        docs = TelegramGS().read()
-    if name == 'gc':
-        docs = TelegramGC().read()
-    if name == 'str':
-        docs = TelegramSTR().read()
-    return render_template(
-        'telegram/read.html',
-        docs=docs
-    )
-
-
-@app.route('/write/<name>')
-def write(name):
-    if name == 'test':
-        TelegramTest().write()
-    if name == 'bg88':
-        TelegramBG88().write()
-    if name == 'tr2':
-        TelegramTR2().write()
-    if name == 'gs':
-        TelegramGS().write()
-    return 'OK'
-
-
-@app.route('/delete/<name>')
-def delete(name):
-    if name == 'test':
-        TelegramTest().delete()
-    if name == 'bg88':
-        TelegramBG88().delete()
-    if name == 'tr2':
-        TelegramTR2().delete()
-    if name == 'gs':
-        TelegramGS().delete()
-    return 'OK'
-
-
 @app.route('/set_webhook')
 def set_webhook():
-    msg = TelegramBG88().set_webhook()
+    msg = TelegramBase().set_webhook()
     return msg
 
 
@@ -92,6 +38,11 @@ def listen_webhook():
     return 'OK'
 
 
+@app.route('/')
+def index():
+    return 'OK'
+
+
 @app.route('/home')
 def home():
     return render_template(
@@ -101,12 +52,23 @@ def home():
     )
 
 
-@app.route('/send/<name>', methods=['POST'])
-def send(name):
-    text = request.form.get('text')
-    if text:
-        TelegramTest().send_message(text)
-    return 'OK'
+@app.route('/read/<name>')
+def read(name):
+    docs = telegram_mapper(name).read()
+    return render_template(
+        'telegram/read.html',
+        docs=docs
+    )
+
+
+@app.route('/cron/read/<name>', methods=['GET'])
+def cron_list(name):
+    instance = telegram_mapper(name)
+    crons = CronService().get_jobs(chat_id=instance.chat_id)
+    return render_template(
+        'cron/read.html',
+        crons=crons
+    )
 
 
 @app.route('/cron/add', methods=['POST'])
@@ -117,23 +79,11 @@ def cron_add():
     return 'OK'
 
 
-@app.route('/cron/list', methods=['POST'])
-def cron_list():
-    for x in CronService().get_jobs():
-        print(x)
-    return 'OK'
-
-
-@app.route('/cron/exec', methods=['POST'])
-def cron_exec():
-    CronService().exec()
-    return 'OK'
-
-
-@app.route('/bot', methods=['GET'])
-def test():
-    TelegramBot({}).check_is_webhook_set()
-    return 'OK'
+@app.route('/cron/del', methods=['POST'])
+def cron_del():
+    _id = dict_get(json.loads(s=request.data), 'id', None)
+    CronService().del_job(_id=_id)
+    return 'ok'
 
 
 @app.template_filter('ts_to_date')
@@ -145,9 +95,34 @@ def ts_to_date(ts):
     return utc_moment.astimezone(pytz.timezone('Asia/Taipei')).strftime("%Y-%m-%d %H:%M:%S")
 
 
-@app.route('/')
-def index():
-    return 'OK'
+@app.template_filter('time_format')
+def time_format(t):
+    y = t[0:4]
+    m = t[4:6]
+    d = t[6:8]
+    h = t[8:10]
+    i = t[10:12]
+    s = t[12:14]
+    return '-'.join([y, m, d]) + ' ' + ':'.join([h, i, s])
+
+
+def telegram_mapper(name):
+    instance = None
+    if name == 'test':
+        instance = TelegramTest()
+    if name == 'bg88':
+        instance = TelegramBG88()
+    if name == 'tr2':
+        instance = TelegramTR2()
+    if name == 'gs':
+        instance = TelegramGS()
+    if name == 'gc':
+        instance = TelegramGC()
+    if name == 'str':
+        instance = TelegramSTR()
+    if name == 'rabby':
+        instance = TelegramRABBY()
+    return instance
 
 
 if __name__ == '__main__':
