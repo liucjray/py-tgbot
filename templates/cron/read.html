@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Python Telegram Bot</title>
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.19/css/jquery.dataTables.css">
+</head>
+<body>
+
+<table id="table" class="cell-border compact hover stripe" style="width:100%">
+    <thead>
+    <tr>
+        <th>is_deleted</th>
+        <th>update_id</th>
+        <th>message.date</th>
+        <th>
+            message.from.first_name <br>
+            message.from.last_name
+        </th>
+        <th>message.text</th>
+        <th>message.sticker <br> message.photo</th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for doc in docs %}
+        <tr class="success">
+            <td>{{ '%s' % 'Y' if doc.is_deleted == 1 else 'N' }}</td>
+            <td>{{ doc.update_id }}</td>
+            <td>{{ doc.message.date|ts_to_date }}</td>
+            <td>{{ doc.message.from.first_name }} {{ doc.message.from.last_name }}</td>
+            <td>{{ doc.message.text }}</td>
+            <td style="width:40%">
+                {{ '%s' % doc.message.sticker if doc.message.sticker else 'N/A' }}
+                <hr>
+                {{ '%s' % doc.message.photo if doc.message.photo else 'N/A' }}
+            </td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>
+<script type="text/javascript" charset="utf8" src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+<script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.js"></script>
+<script>
+    $(function () {
+        $("#table").DataTable({
+            "lengthMenu": [50, 100, 150, 200, 500],
+            "pageLength": 100,
+        });
+    });
+</script>
+</body>
+</html>

@@ -39,6 +39,8 @@ def job_10s():
             cron_text = "[預約訊息發送] %s: %s" % (message_from, cron_text)
             bot.send_message(chat_id, cron_text)
             print('[%s] Send message job DONE: %s' % (cron_time, cron_text))
+
+            # TODO: 寫入已發送的訊息之後才刪的到
         else:
             continue
 

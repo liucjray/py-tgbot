@@ -6,6 +6,7 @@ from services.telegram.TelegramBG88 import *
 from services.telegram.TelegramTest import *
 from services.telegram.TelegramGS import *
 from services.telegram.TelegramGC import *
+from services.telegram.TelegramRABBY import *
 from services.CronService import *
 
 
@@ -87,6 +88,7 @@ def listen_webhook():
     TelegramSTR().listen_webhook(d)
     TelegramGS().listen_webhook(d)
     TelegramGC().listen_webhook(d)
+    TelegramRABBY().listen_webhook(d)
     return 'OK'
 
 
