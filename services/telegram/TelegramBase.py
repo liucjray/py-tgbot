@@ -27,6 +27,7 @@ class TelegramBase:
         self.sync_cmd = settings.get('sync_cmd', None)
         self.gtts_cmd = settings.get('gtts_cmd', None)
         self.jobs_cmd = settings.get('jobs_cmd', None)
+        self.svn_log_cmd = settings.get('svn_log_cmd', None)
 
         # mongodb
         self.atlas = AtlasService(settings)
@@ -132,6 +133,11 @@ class TelegramBase:
             if self.sync_cmd is not None:
                 if text in self.sync_cmd:
                     self.vcs_sync(text)
+
+            # 檢查是否有 svn log 關鍵字
+            if self.svn_log_cmd is not None:
+                if text in self.svn_log_cmd:
+                    self.svn_log(text)
 
             # 檢查是否有 ttx 關鍵字
             if self.gtts_cmd is not None:

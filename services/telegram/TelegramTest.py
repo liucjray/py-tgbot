@@ -18,6 +18,7 @@ class TelegramTest(TelegramBase):
             'collection': 'test',
             'delete_cmd': ['/del'],
             'sync_cmd': ['/gssync', '/gcsync', '/owsync', '/owusync', '/oasync'],
+            'svn_log_cmd': ['/gs_svn_log_latest'],
             'gtts_cmd': ['/say='],
             'jobs_cmd': ['/job='],
         }
@@ -43,3 +44,10 @@ class TelegramTest(TelegramBase):
         if text == '/oasync':
             self.set_vcs(self.config['VCS']['OA_PATH'])
         self.vcs.sync()
+
+    def svn_log(self, text):
+        if text == '/gs_svn_log_latest':
+            self.set_vcs(self.config['VCS']['GS_PATH'])
+            r = self.vcs.get_svn_version_latest()
+            svn_log_latest = self.vcs.get_svn_log_by_version(r)
+            self.vcs.send_message(svn_log_latest)

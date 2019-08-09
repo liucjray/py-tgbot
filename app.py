@@ -20,7 +20,7 @@ app = create_app()
 
 @app.route('/set_webhook')
 def set_webhook():
-    msg = TelegramBase().set_webhook()
+    msg = TelegramTest().set_webhook()
     return msg
 
 

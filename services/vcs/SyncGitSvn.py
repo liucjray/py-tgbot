@@ -1,3 +1,6 @@
+# coding: utf-8
+import sys
+import chardet
 import subprocess
 import time
 
@@ -19,9 +22,14 @@ class SyncGitSvn:
     def eo(self, command):
         command = "cd {} & {}".format(self.path, command)
         print(command)
-        output = subprocess.check_output(command, shell=True).decode('utf-8')
-        print(output)
-        return output
+        output = subprocess.check_output(command, shell=True)
+
+        if chardet.detect(output) is not None:
+            encodeing = chardet.detect(output)['encoding']
+            if encodeing is not None:
+                output = output.decode(encodeing).encode('utf-8')
+
+        return output.decode('utf-8')
 
     def sync(self):
         self.eo("svn update")
@@ -44,7 +52,7 @@ class SyncGitSvn:
     def tag(self):
         self.sync()
         tag_name = time.strftime("%Y%m%d", time.localtime())
-        svn_version = self.eo("svn info --show-item last-changed-revision")
+        svn_version = self.get_svn_version_latest()
         svn_status = self.eo("svn status")
         git_status = self.eo("git status -s")
         if svn_status == git_status:
@@ -60,6 +68,14 @@ class SyncGitSvn:
             error_msg = '### [Error] git svn 目前為非同步狀態 ###'
             self.send_message(error_msg)
             print(error_msg)
+
+    def get_svn_version_latest(self):
+        command = "svn info --show-item last-changed-revision"
+        return self.eo(command)
+
+    def get_svn_log_by_version(self, version):
+        command = "svn log -v -c {}".format(version)
+        return self.eo(command)
 
     def tag_local_check(self, tag_name):
         command = "git tag -l %s" % tag_name
@@ -101,5 +117,8 @@ class SyncGitSvn:
     def send_message(self, msg):
         self.bot.send_message(self.chat_id, msg)
 
-# a = SyncGitSvn({'path': 'C:\B2B\gameserver.SVN', 'bot': None, 'chat_id': None}).tag_local_check('20190525')
-# print(a)
+#
+# vcs = SyncGitSvn({'path': 'C:\B2B\gameserver.SVN', 'bot': None, 'chat_id': None})
+# v = vcs.get_svn_version_latest()
+# log = vcs.get_svn_log_by_version(v)
+# print(log)

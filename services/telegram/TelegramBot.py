@@ -12,7 +12,6 @@ class TelegramBot:
     def __init__(self, settings):
         self.token = settings.get('token', None) or self.config['TG']['ACCESS_TOKEN_GYOABOT']
         self.set_bot(self.token)
-        pass
 
     def set_bot(self, token):
         token = token or self.token
