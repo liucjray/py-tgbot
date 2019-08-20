@@ -70,6 +70,9 @@ class SyncGitSvn:
             print(error_msg)
 
     def get_svn_version_latest(self):
+        # 先執行一次更新避免未讀取到最新版號
+        self.e("svn update")
+
         command = "svn info --show-item last-changed-revision"
         return self.eo(command)
 

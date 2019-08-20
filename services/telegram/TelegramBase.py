@@ -168,7 +168,7 @@ class TelegramBase:
         j_time = text[text.find('|') + 1: len(text)]
 
         sample_time = '20190102030405'
-        if len(j_time) == len(sample_time) and j_time.isdigit():
+        if check_job_time_format(j_time):
             job = {"cron": {"text": j_text, "time": j_time, "done": 0}}
             self.cron.add(updates, job)
             msg = '[O] 定時任務新增成功\n===================\n時間: {}\n訊息: {}'.format(j_time, j_text)

@@ -9,31 +9,41 @@
 </head>
 <body>
 
-<table id="table" class="cell-border compact hover stripe" style="width:100%">
-    <thead>
-    <tr>
-        <th>message.from.first_name<br>message.from.last_name</th>
-        <th>cron.time</th>
-        <th>cron.text</th>
-        <th>cron.done</th>
-        <th>操作</th>
-    </tr>
-    </thead>
-    <tbody>
-    {% for cron in crons %}
-        <tr class="success">
-            <td>{{ cron.message.from.first_name }} {{ cron.message.from.last_name }}</td>
-            <td>{{ cron.cron.time|time_format }}</td>
-            <td>{{ cron.cron.text }}</td>
-            <td>{{ '%s' % 'Y' if cron.cron.done == 1 else 'N' }}</td>
-            <td>
-                <button class="btn btn-xs btn-primary">編輯</button>
-                <button class="btn btn-xs btn-danger btn_del_job" data-id="{{ cron._id }}">刪除</button>
-            </td>
-        </tr>
-    {% endfor %}
-    </tbody>
-</table>
+<div class="row">
+    <div class="col-md-12">
+        <button type="button" class="btn btn-primary">新增任务</button>
+    </div>
+    <div class="col-md-12">
+        <hr>
+    </div>
+    <div class="col-md-9 col-md-offset-3">
+        <table id="table" class="cell-border compact hover stripe" style="width:100%">
+            <thead>
+            <tr>
+                <th>message.from.first_name<br>message.from.last_name</th>
+                <th>cron.time</th>
+                <th>cron.text</th>
+                <th>cron.done</th>
+                <th>操作</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for cron in crons %}
+                <tr class="success">
+                    <td>{{ cron.message.from.first_name }} {{ cron.message.from.last_name }}</td>
+                    <td>{{ cron.cron.time|time_format }}</td>
+                    <td>{{ cron.cron.text }}</td>
+                    <td>{{ '%s' % 'Y' if cron.cron.done == 1 else 'N' }}</td>
+                    <td>
+                        <button class="btn btn-xs btn-primary">編輯</button>
+                        <button class="btn btn-xs btn-danger btn_del_job" data-id="{{ cron._id }}">刪除</button>
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
 <script type="text/javascript" charset="utf8" src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
 <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.18.0/axios.min.js"></script>

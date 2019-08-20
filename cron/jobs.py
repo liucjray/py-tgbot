@@ -24,7 +24,15 @@ def job_10s():
     s = AtlasJobService()
     jobs = s.read_jobs()
     for job in jobs:
-        message_from = dict_get(job, 'message.from.first_name') + ' ' + dict_get(job, 'message.from.last_name')
+
+        sender_name = []
+        if dict_get(job, 'message.from.first_name') is not None:
+            sender_name.append(dict_get(job, 'message.from.first_name'))
+        if dict_get(job, 'message.from.last_name') is not None:
+            sender_name.append(dict_get(job, 'message.from.last_name'))
+        message_from = ' '.join(sender_name)
+        # print(message_from)
+
         chat_id = dict_get(job, 'message.chat.id')
         message_id = dict_get(job, 'message.message_id')
         cron_text = dict_get(job, 'cron.text')
