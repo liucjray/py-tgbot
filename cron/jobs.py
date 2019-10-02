@@ -1,9 +1,11 @@
 from flask import Flask
 from flask_apscheduler import APScheduler
+from apscheduler.schedulers.background import BackgroundScheduler
 from repositories.AtlasJobService import *
 from services.telegram.TelegramBot import *
 from datetime import datetime, timedelta
 from dateutil import parser
+import time
 
 
 class Config(object):
@@ -57,13 +59,20 @@ def job_10s():
 
 
 if __name__ == '__main__':
-    app = Flask(__name__)
-    app.config.from_object(Config())
+    # app = Flask(__name__)
+    # app.config.from_object(Config())
+    #
+    # scheduler = APScheduler()
+    # # it is also possible to enable the API directly
+    # # scheduler.api_enabled = True
+    # scheduler.init_app(app)
+    # scheduler.start()
 
-    scheduler = APScheduler()
-    # it is also possible to enable the API directly
-    # scheduler.api_enabled = True
-    scheduler.init_app(app)
+    # app.run(port=5001)
+
+    scheduler = BackgroundScheduler()
+    scheduler.add_job(job_10s, 'interval', seconds=10)
+    # 启动调度任务
     scheduler.start()
-
-    app.run()
+    while True:
+        time.sleep(5)

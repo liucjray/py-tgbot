@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, send_from_directory
 
 from services.telegram.TelegramSTR import *
 from services.telegram.TelegramTR2 import *
@@ -125,5 +125,10 @@ def telegram_mapper(name):
     return instance
 
 
+@app.route('/favicon.ico')
+def favicon():
+    return send_from_directory(os.path.join('static'), 'favicon.ico')
+
+
 if __name__ == '__main__':
-    app.run()
+    app.run(port=5000)
