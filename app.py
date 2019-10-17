@@ -7,6 +7,7 @@ from services.telegram.TelegramTest import *
 from services.telegram.TelegramGS import *
 from services.telegram.TelegramGC import *
 from services.telegram.TelegramRABBY import *
+from services.telegram.TelegramADMIN import *
 from services.CronService import *
 
 
@@ -35,6 +36,8 @@ def listen_webhook():
     TelegramGS().listen_webhook(d)
     TelegramGC().listen_webhook(d)
     TelegramRABBY().listen_webhook(d)
+    TelegramADMIN().listen_webhook(d)
+    print(d)
     return 'OK'
 
 
@@ -122,6 +125,8 @@ def telegram_mapper(name):
         instance = TelegramSTR()
     if name == 'rabby':
         instance = TelegramRABBY()
+    if name == 'admin':
+        instance = TelegramADMIN()
     return instance
 
 
