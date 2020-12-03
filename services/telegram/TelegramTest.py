@@ -17,7 +17,10 @@ class TelegramTest(TelegramBase):
             'chat_id': self.chat_id,
             'collection': 'test',
             'delete_cmd': ['/del'],
-            'sync_cmd': ['/gssync', '/gcsync', '/owsync', '/owusync', '/oasync'],
+            'sync_cmd': [
+                '/gssync', '/gcsync', '/owsync', '/owusync', '/oasync',
+                '/phantomsync', '/drawnumberoldsync', '/drawnumbersync'
+            ],
             'svn_log_cmd': ['/gs_svn_log_latest'],
             'gtts_cmd': ['/say='],
             'jobs_cmd': ['/job='],
@@ -43,6 +46,12 @@ class TelegramTest(TelegramBase):
             self.set_vcs(self.config['VCS']['OWU_PATH'])
         if text == '/oasync':
             self.set_vcs(self.config['VCS']['OA_PATH'])
+        if text == '/phantomsync':
+            self.set_vcs(self.config['VCS']['PHANTOM_PATH'])
+        if text == '/drawnumberoldsync':
+            self.set_vcs(self.config['VCS']['DNO_PATH'])
+        if text == '/drawnumbersync':
+            self.set_vcs(self.config['VCS']['DN_PATH'])
         self.vcs.sync()
 
     def svn_log(self, text):

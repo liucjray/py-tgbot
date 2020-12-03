@@ -26,12 +26,19 @@ def dict_get(dictionary, dotted_key, default=None):
 
 def check_job_time_format(input_time):
     try:
-        sample_time = '20190102030405'
+        sample_time14 = '20190102030405'  # 14
+        sample_time12 = '201901020304'  # 12
+
+        if len(input_time) not in [len(sample_time14), len(sample_time12)]:
+            return False
+
+        if not input_time.isdigit():
+            return False
+
         month = input_time[4:6]
         day = input_time[6:8]
         hour = input_time[8:10]
         minute = input_time[10:12]
-        second = input_time[12:14]
 
         if int(month) not in range(1, 13):
             return False
@@ -41,12 +48,12 @@ def check_job_time_format(input_time):
             return False
         if int(minute) not in range(0, 60):
             return False
-        if int(second) not in range(0, 60):
-            return False
-        if len(input_time) != len(sample_time):
-            return False
-        if not input_time.isdigit():
-            return False
+
+        if len(input_time) == len(sample_time14):
+            second = input_time[12:14]
+            if int(second) not in range(0, 60):
+                return False
+
         return True
     except Exception as e:
         return False

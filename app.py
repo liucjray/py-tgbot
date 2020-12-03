@@ -1,5 +1,5 @@
-from flask import Flask, render_template, request, send_from_directory
-
+from flask import Flask, render_template, request, send_from_directory, jsonify
+import datetime
 from services.telegram.TelegramSTR import *
 from services.telegram.TelegramTR2 import *
 from services.telegram.TelegramBG88 import *
@@ -7,7 +7,9 @@ from services.telegram.TelegramTest import *
 from services.telegram.TelegramGS import *
 from services.telegram.TelegramGC import *
 from services.telegram.TelegramRABBY import *
+from services.telegram.TelegramRABBYWORK import *
 from services.telegram.TelegramADMIN import *
+from services.telegram.TelegramTEAM import *
 from services.CronService import *
 
 
@@ -17,6 +19,16 @@ def create_app():
 
 
 app = create_app()
+
+
+# @app.route('/telegram/listen', methods=['POST'])
+# def telegram_listen():
+#     import requests
+#     d = json.loads(s=request.data)
+#     print(d)
+#     resp = requests.post('http://192.168.10.10/telegram/listen', data=d)
+#     print(resp.status_code)
+#     print(resp.content)
 
 
 @app.route('/set_webhook')
@@ -36,8 +48,10 @@ def listen_webhook():
     TelegramGS().listen_webhook(d)
     TelegramGC().listen_webhook(d)
     TelegramRABBY().listen_webhook(d)
+    TelegramRABBYWORK().listen_webhook(d)
+    TelegramTEAM().listen_webhook(d)
     TelegramADMIN().listen_webhook(d)
-    print(d)
+    print(datetime.datetime.now(), ' ### TG Msg ### ', d)
     return 'OK'
 
 
@@ -51,7 +65,7 @@ def home():
     return render_template(
         'home.html',
         config=get_config(),
-        groups=['gs', 'test', 'tr2', 'bg88']
+        groups=['gs', 'test', 'tr2', 'bg88', 'admin']
     )
 
 
@@ -125,8 +139,12 @@ def telegram_mapper(name):
         instance = TelegramSTR()
     if name == 'rabby':
         instance = TelegramRABBY()
+    if name == 'rabbywork':
+        instance = TelegramRABBYWORK()
     if name == 'admin':
         instance = TelegramADMIN()
+    if name == 'team':
+        instance = TelegramTEAM()
     return instance
 
 
@@ -136,4 +154,4 @@ def favicon():
 
 
 if __name__ == '__main__':
-    app.run('0.0.0.0', port=5000, debug=True)
+    app.run('0.0.0.0', port=5000)

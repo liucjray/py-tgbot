@@ -32,6 +32,7 @@ class SyncGitSvn:
         return output.decode('utf-8')
 
     def sync(self):
+        self.eo("svn revert -R .")
         self.eo("svn update")
         self.sync_git()
         self.bot.send_message(self.chat_id, 'sync success')

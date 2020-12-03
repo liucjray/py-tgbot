@@ -40,7 +40,8 @@ class AtlasService:
             if self.prepares:
                 self.collection.insert_many(self.prepares, ordered=False)
         except Exception as e:
-            print(__file__, e)
+            pass
+            # print(__file__, e.args)
 
     def get_data_exist(self):
         return self.collection.find({'is_deleted': None})
