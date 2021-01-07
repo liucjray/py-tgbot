@@ -10,7 +10,7 @@ class TelegramBot:
     is_webhook_set = False
 
     def __init__(self, settings):
-        self.token = settings.get('token', None) or self.config['TG']['ACCESS_TOKEN_GYOABOT']
+        self.token = settings.get('token', None) or self.config['TG']['ACCESS_TOKEN_STR87WEBHOOKBOT']
         self.set_bot(self.token)
 
     def set_bot(self, token):

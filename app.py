@@ -7,6 +7,7 @@ from services.telegram.TelegramTest import *
 from services.telegram.TelegramGS import *
 from services.telegram.TelegramGC import *
 from services.telegram.TelegramRABBY import *
+from services.telegram.TelegramRABBYTW import *
 from services.telegram.TelegramRABBYWORK import *
 from services.telegram.TelegramADMIN import *
 from services.telegram.TelegramTEAM import *
@@ -33,7 +34,7 @@ app = create_app()
 
 @app.route('/set_webhook')
 def set_webhook():
-    msg = TelegramTest().set_webhook()
+    msg = TelegramRABBYTW().set_webhook()
     return msg
 
 
@@ -49,6 +50,7 @@ def listen_webhook():
     TelegramGC().listen_webhook(d)
     TelegramRABBY().listen_webhook(d)
     TelegramRABBYWORK().listen_webhook(d)
+    TelegramRABBYTW().listen_webhook(d)
     TelegramTEAM().listen_webhook(d)
     TelegramADMIN().listen_webhook(d)
     print(datetime.datetime.now(), ' ### TG Msg ### ', d)
@@ -139,6 +141,8 @@ def telegram_mapper(name):
         instance = TelegramSTR()
     if name == 'rabby':
         instance = TelegramRABBY()
+    if name == 'rabbytw':
+        instance = TelegramRABBYTW()
     if name == 'rabbywork':
         instance = TelegramRABBYWORK()
     if name == 'admin':
